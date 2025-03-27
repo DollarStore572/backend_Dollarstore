@@ -11,6 +11,6 @@ router.get('/clientes/:id', obtenerCliente);
 
 router.post('/clientes', createClientes);
 
-router.patch('/clientes/:id', actualizarClientes);
+router.patch('/clientes/:id_cliente', actualizarClientes);
 
 export default router;
