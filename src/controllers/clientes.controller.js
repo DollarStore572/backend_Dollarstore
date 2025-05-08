@@ -31,58 +31,67 @@ export const obtenerCliente = async (req, res) => {
   }
 };
 
+// Registrar un nuevo cliente
+export const registrarCliente = async (req, res) => {
+  try {
+    const { nombre, apellido, telefono, cedula } = req.body;
 
-//Insertar un cliente
-export const createClientes = async (req, res) => {
-  try{
-    const {id_cliente, nombre, apellido, telefono, direccion} = req.body;
-    const [result] = await pool.query('INSERT INTO Clientes (id_cliente, nombre, apellido, telefono, direccion ) VALUES (?,?,?,?,?)', [id_cliente, nombre, apellido,telefono, direccion]);
-    
-    if(result.affectedRows <= 0){
-      return res.status(500).json({
-        message: `Error al guardar datos del cliente.`
-      });
-    } else {
-      console.log(result);
-      return res.status(200).json({
-        message: `Los datos del cliente con id ${result.insertId} se han guardado exitosamente.`
-      });
-    }
+    const [result] = await pool.query(
+      'INSERT INTO clientes (nombre, apellido, telefono, cedula) VALUES (?, ?, ?, ?)',
+      [nombre, apellido, telefono, cedula]
+    );
+
+    res.status(201).json({ id_cliente: result.insertId });
   } catch (error) {
     return res.status(500).json({
-      message: 'Ha ocurrido un error al guardar los datos del cliente.',
+      mensaje: 'Ha ocurrido un error al registrar el cliente.',
       error: error
     });
   }
 };
 
+// Eliminar un cliente por su ID
+export const eliminarCliente = async (req, res) => {
+  try {
+    const [result] = await pool.query('DELETE FROM clientes WHERE id_cliente = ?', [req.params.id]);
 
-
-//Actualizar un clientes
-export const actualizarClientes = async (req, res) => {
-  try{
-    //throw new Error('Error al actualizar.');
-    const {id_cliente} = req.params;
-    const {nombre, apellido, telefono, direccion} = req.body;
-  
-    const [result] = await pool.query('UPDATE Clientes SET nombre = IFNULL(?, nombre), apellido = IFNULL(?, apellido), telefono = IFNULL(?, telefono), direccion = IFNULL(?, direccion) WHERE id_cliente = ?',
-       [nombre, apellido, telefono, direccion, id_cliente]);
-  
-    if(result.affectedRows === 0){
+    if (result.affectedRows === 0) {
       return res.status(404).json({
-      message: `Error al actualizar. Clientes con id ${id_cliente} no encontrado.`
+        mensaje: `Error al eliminar el cliente. El ID ${req.params.id} no fue encontrado.`
       });
     }
-  
-    const [rows] = await pool.query('SELECT * FROM Clientes WHERE id_cliente = ?', [id_cliente])
-  
-    console.log(result);
-    res.json(rows[0]);
+
+    res.status(204).send(); // Respuesta sin contenido para indicar éxito
   } catch (error) {
     return res.status(500).json({
-      message: 'Ha ocurrido un error al actualizar los datos del cliente.'
+      mensaje: 'Ha ocurrido un error al eliminar el cliente.',
+      error: error
     });
   }
 };
 
+// Actualizar un cliente por su ID (parcial o completa)
+export const actualizarCliente = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const datos = req.body;
 
+    const [resultado] = await pool.query(
+      'UPDATE clientes SET ? WHERE id_cliente = ?',
+      [datos, id]
+    );
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        mensaje: `El cliente con ID ${id} no existe.`,
+      });
+    }
+
+    res.status(204).send(); // Respuesta sin contenido para indicar éxito
+  } catch (error) {
+    return res.status(500).json({
+      mensaje: 'Error al actualizar el cliente.',
+      error: error,
+    });
+  }
+};
