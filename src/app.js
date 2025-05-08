@@ -8,7 +8,8 @@ import rutasProveedores from './routes/proveedores.routes.js';
 import rutasCategorias from './routes/categorias.routes.js';
 import rutasMarcas from './routes/marcas.routes.js';
 import rutasCompras from './routes/compras.routes.js';
-import rutasDetalleCompras from './routes/detalle_compras.routes.js';
+import rutasDetalleCompras from './routes/detalles_compras.routes.js';
+import rutasDetalleVentas from './routes/detalles_ventas.routes.js';
 
 
 
@@ -32,6 +33,9 @@ app.use('/api', rutasCategorias);
 app.use('/api', rutasMarcas);
 app.use('/api', rutasCompras);
 app.use('/api', rutasDetalleCompras);
+app.use('/api', rutasDetalleVentas);
+
+
 
 
 // Manejo de rutas no encontradas

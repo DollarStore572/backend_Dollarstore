@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { obtenerComprasConDetalles } from '../controllers/detalle_compras.controller.js';
+import { obtenerComprasConDetalles } from '../controllers/detalles_compras.controller.js';
 
 const router = Router();
 
