@@ -55,7 +55,7 @@ export const registrarProducto = async (req, res) => {
       'INSERT INTO Productos (nombre_producto, descripcion, precio_unitario, existencia, id_marca, id_categoria, calificacion) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [
         nombre_producto,
-        descripcion, // Puede ser opcional
+        descripcion , // Puede ser opcional
         precio_unitario,
         existencia,
         id_marca,

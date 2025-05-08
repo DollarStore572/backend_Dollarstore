@@ -49,4 +49,3 @@ export const obtenerCompra = async (req, res) => {
     });
   }
 };
-
