@@ -268,18 +268,18 @@ INNER JOIN Productos p ON dv.id_producto = p.id_producto;
         id_compra,
         id_proveedor,
         fecha
-      FROM Compras
-      WHERE id_compra = 1;
+    FROM Compras
+    WHERE id_compra = 1;
       
-       SELECT 
-          c.id_compra,
-          dc.id_detalle_compra,
-          c.fecha,
-          CONCAT(pr.compania) AS nombre_compania,
-          p.nombre_producto,
-          dc.cantidad,
-          dc.precio_compras,
-          (dc.cantidad * dc.precio_compras) AS subtotal
+        SELECT 
+        c.id_compra,
+        dc.id_detalle_compra,
+        c.fecha,
+        CONCAT(pr.compania) AS nombre_compania,
+        p.nombre_producto,
+        dc.cantidad,
+        dc.precio_compras,
+        (dc.cantidad * dc.precio_compras) AS subtotal
         FROM Compras c
         INNER JOIN Proveedores pr ON c.id_proveedor = pr.id_proveedor
         INNER JOIN Detalles_Compras dc ON c.id_compra = dc.id_compra
@@ -290,7 +290,7 @@ INNER JOIN Productos p ON dv.id_producto = p.id_producto;
 SELECT 
     c.id_compra,
     c.fecha,
-   CONCAT(compania) AS nombre_compania,
+    CONCAT(compania) AS nombre_compania,
     p.descripcion AS nombre_producto,
     dc.cantidad,
     dc.precio_compras AS precio_unitario,
