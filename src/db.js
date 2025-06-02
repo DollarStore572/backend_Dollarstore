@@ -10,8 +10,6 @@ export const pool = createPool({
   database: DB_DATABASE
 });
 
-
-
 export const pool2 = createPool({
   host: DB_HOST2,
   user: DB_USER2,

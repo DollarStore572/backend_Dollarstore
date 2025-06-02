@@ -14,7 +14,6 @@ import rutasEstadisticas from './routes/estadisticas.routes.js';
 
 
 
-
 const app = express();
 
 // Habilitar CORS para cualquier origen
@@ -40,8 +39,6 @@ app.use('/api', rutasCompras);
 app.use('/api', rutasDetalleCompras);
 app.use('/api', rutasDetalleVentas);
 app.use('/api', rutasEstadisticas);
-
-
 
 
 

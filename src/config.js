@@ -2,7 +2,6 @@ import {config} from 'dotenv';
 
 config();
 
-
 export const PORT = process.env.PORT || 3000;
 export const DB_HOST = process.env.DB_HOST || 'localhost';
 export const DB_PORT = process.env.DB_PORT || 3307;
@@ -16,6 +15,8 @@ export const DB_PORT2 = process.env.DB_PORT2 || 3307;
 export const DB_USER2 = process.env.DB_USER2 || 'dbgustavo';
 export const DB_PASSWORD2 = process.env.DB_PASSWORD2 || 'messi12';
 export const DB_DATABASE2 = process.env.DB_DATABASE2 || 'dollarstore_ACT_datamart';
+
+
 
 
 //export const PORT = process.env.PORT;
