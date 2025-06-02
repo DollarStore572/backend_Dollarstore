@@ -10,6 +10,7 @@ import rutasMarcas from './routes/marcas.routes.js';
 import rutasCompras from './routes/compras.routes.js';
 import rutasDetalleCompras from './routes/detalles_compras.routes.js';
 import rutasDetalleVentas from './routes/detalles_ventas.routes.js';
+import rutasEstadisticas from './routes/estadisticas.routes.js';
 
 
 
@@ -21,6 +22,10 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type'],
 }));
+
+
+app.use(express.json({ limit: '10mb' })); // Aumenta a 10 MB
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(express.json());
 
@@ -34,6 +39,9 @@ app.use('/api', rutasMarcas);
 app.use('/api', rutasCompras);
 app.use('/api', rutasDetalleCompras);
 app.use('/api', rutasDetalleVentas);
+app.use('/api', rutasEstadisticas);
+
+
 
 
 

@@ -38,29 +38,31 @@ export const registrarProducto = async (req, res) => {
       nombre_producto, 
       descripcion, 
       precio_unitario, 
-      existencia,
-      id_categoria,
-      id_marca, 
-      calificacion
+      existencia, 
+      id_marca,
+      id_categoria, 
+      calificacion,
+      imagen 
     } = req.body;
 
     // Validación básica de campos requeridos
-    if (!nombre_producto || !descripcion || !id_categoria || !id_marca || !precio_unitario || !existencia || ! calificacion) {
+    if (!nombre_producto || !id_categoria || !precio_unitario || !existencia) {
       return res.status(400).json({
         mensaje: 'Faltan campos requeridos: nombre, categoría, precio o stock.'
       });
     }
 
     const [result] = await pool.query(
-      'INSERT INTO Productos (nombre_producto, descripcion, precio_unitario, existencia, id_marca, id_categoria, calificacion) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO Productos (nombre_producto, descripcion, precio_unitario, existencia, id_marca, id_categoria, calificacion, imagen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [
         nombre_producto,
-        descripcion , // Puede ser opcional
-        precio_unitario,
-        existencia,
+        descripcion || null, // Puede ser opcional
+        precio_unitario, 
+        existencia, 
         id_marca,
-        id_categoria,
-        calificacion || null
+        id_categoria, 
+        calificacion, 
+        imagen || null // Puede ser opcional
       ]
     );
 
@@ -75,6 +77,9 @@ export const registrarProducto = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 
