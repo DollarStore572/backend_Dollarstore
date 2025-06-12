@@ -5,18 +5,18 @@ export const obtenerVentasConDetalles = async (req, res) => {
   try {
     const [result] = await pool.query(`
       SELECT 
-    v.id_venta,
-    dv.id_detalle_venta,
-    v.fecha,
-    CONCAT(c.nombre, ' ', c.apellido) AS nombre_cliente,
-    p.descripcion AS nombre_producto,
-    dv.cantidad,
-    dv.precio_ventas AS precio_unitario,
-    (dv.cantidad * dv.precio_ventas) AS subtotal
-  FROM Ventas v
-  INNER JOIN Clientes c ON v.id_cliente = c.id_cliente
-  INNER JOIN Detalles_Ventas dv ON v.id_venta = dv.id_venta
-  INNER JOIN Productos p ON dv.id_producto = p.id_producto;
+        v.id_venta,
+        dv.id_detalle_venta,
+        v.fecha,
+        CONCAT(c.nombre, ' ', c.apellido) AS nombre_cliente,
+        p.descripcion AS nombre_producto,
+        dv.cantidad,
+        dv.precio_ventas AS precio_unitario,
+        (dv.cantidad * dv.precio_ventas) AS subtotal
+      FROM Ventas v
+      INNER JOIN Clientes c ON v.id_cliente = c.id_cliente
+      INNER JOIN Detalles_Ventas dv ON v.id_venta = dv.id_venta
+      INNER JOIN Productos p ON dv.id_producto = p.id_producto;
     `); 
     
     res.json(result);
@@ -52,24 +52,32 @@ export const obtenerVentas = async (req, res) => {
   }
 };
 
-export const eliminarVenta = async (req, res) => {
+// Obtener una venta específica por id_venta
+export const obtenerVentaPorId = async (req, res) => {
   try {
-      const { id_venta } = req.params;
+    const { id_venta } = req.params;
 
-      // Eliminar primero los detalles asociados en Detalles_Ventas
-      await pool.query('DELETE FROM Detalles_Ventas WHERE id_venta = ?', [id_venta]);
+    const [venta] = await pool.query(`
+      SELECT 
+        v.id_venta,
+        v.id_cliente,
+        v.fecha,
+        CONCAT(c.nombre, ' ', c.apellido) AS nombre_cliente
+      FROM Ventas v
+      INNER JOIN Clientes c ON v.id_cliente = c.id_cliente
+      WHERE v.id_venta = ?
+    `, [id_venta]);
 
-      // Luego eliminar la venta en Ventas
-      const [result] = await pool.query('DELETE FROM Ventas WHERE id_venta = ?', [id_venta]);
+    if (venta.length === 0) {
+      return res.status(404).json({ mensaje: 'Venta no encontrada' });
+    }
 
-      if (result.affectedRows === 0) {
-          return res.status(404).json({ message: 'Venta no encontrada' });
-      }
-
-      res.json({ message: 'Venta eliminada exitosamente' });
+    res.json(venta[0]); // Devuelve solo el primer objeto (una sola venta)
   } catch (error) {
-      console.error('Error en eliminarVenta:', error);
-      res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      mensaje: 'Ha ocurrido un error al obtener los datos de la venta.',
+      error: error.message
+    });
   }
 };
 
@@ -105,13 +113,13 @@ export const registrarVenta = async (req, res) => {
 // Actualizar una venta con sus detalles
 export const actualizarVenta = async (req, res) => {
   const { id_venta } = req.params;
-  const { id_cliente, id_tiempo, detalles } = req.body;
+  const { id_cliente, fecha, detalles } = req.body;
 
   try {
     // Actualizar la venta
     const [ventaResult] = await pool.query(
-      'UPDATE Ventas SET id_cliente = ?, id_tiempo = ? WHERE id_venta = ?',
-      [id_cliente, id_tiempo, id_venta]
+      'UPDATE Ventas SET id_cliente = ?, fecha = ? WHERE id_venta = ?',
+      [id_cliente, fecha, id_venta]
     );
 
     if (ventaResult.affectedRows === 0) {
@@ -153,32 +161,38 @@ export const actualizarVenta = async (req, res) => {
   }
 };
 
-// Obtener una venta específica por id_venta
-export const obtenerVentaPorId = async (req, res) => {
+// Eliminar una venta
+export const eliminarVenta = async (req, res) => {
   try {
     const { id_venta } = req.params;
 
-    const [venta] = await pool.query(`
-      SELECT 
-        v.id_venta,
-        v.id_cliente,
-        v.fecha,
-        t.fecha,
-        CONCAT(c.nombre, ' ', c.apellido) AS nombre_cliente
-      FROM Ventas v
-      INNER JOIN Clientes c ON v.id_cliente = c.id_cliente
-      WHERE id_venta = ?
-    `, [id_venta]);
+    // Obtener detalles actuales para restaurar existencia
+    const [detallesActuales] = await pool.query(
+      'SELECT id_producto, cantidad FROM Detalles_Ventas WHERE id_venta = ?',
+      [id_venta]
+    );
 
-    if (venta.length === 0) {
-      return res.status(404).json({ mensaje: 'Venta no encontrada' });
+    // Restaurar existencia de productos
+    for (const detalle of detallesActuales) {
+      await pool.query(
+        'UPDATE Productos SET existencia = existencia + ? WHERE id_producto = ?',
+        [detalle.cantidad, detalle.id_producto]
+      );
     }
 
-    res.json(venta[0]); // Devuelve solo el primer objeto (una sola venta)
+    // Eliminar primero los detalles asociados en Detalles_Ventas
+    await pool.query('DELETE FROM Detalles_Ventas WHERE id_venta = ?', [id_venta]);
+
+    // Luego eliminar la venta en Ventas
+    const [result] = await pool.query('DELETE FROM Ventas WHERE id_venta = ?', [id_venta]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Venta no encontrada' });
+    }
+
+    res.json({ message: 'Venta eliminada exitosamente' });
   } catch (error) {
-    return res.status(500).json({
-      mensaje: 'Ha ocurrido un error al obtener los datos de la venta.',
-      error: error.message
-    });
+    console.error('Error en eliminarVenta:', error);
+    res.status(500).json({ message: error.message });
   }
 };
